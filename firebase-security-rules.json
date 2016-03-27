@@ -1,0 +1,46 @@
+{
+  "rules": {
+    "users": {
+      ".read":true,
+      "$uid": {
+        ".write": "auth != null && auth.uid == $uid",
+        ".validate":"newData.hasChildren(['name','email'])",
+        "name":{".validate":"newData.isString()"},
+        "email":{".validate":"newData.isString()"},
+        "imageUrl":{".validate":"newData.isString()"},
+        "lists":{
+          "$list_id":{
+              ".write": "auth != null && auth.uid == $uid",
+              ".validate":"newData.hasChildren(['name','description','topic','publish'])",              
+              "name":{".validate":"newData.isString()"},
+              "topic":{".validate":"newData.isString()"},
+              "description":{".validate":"newData.isString()"},
+              "publish":{".validate":"newData.isBoolean()"},
+              "viewers":{".validate":"newData.isNumber()"},
+              "content":{
+                "$video_id":{
+                  ".write": "auth != null && auth.uid == $uid",
+                  ".validate":"newData.hasChildren(['name','description','contentUrl','contentType','startTime','endTime'])",
+                  ".indexOn": ["order"],
+                  "id":{".validate":"newData.isNumber()"},
+                  "order":{".validate":"newData.isNumber()"},
+                  "name":{".validate":"newData.isString()"},
+                  "description":{".validate":"newData.isString()"},
+                  "contentUrl":{".validate":"newData.isString()"},
+                  "startTime":{".validate":"newData.isNumber()"},
+                  "endTime":{".validate":"newData.isNumber()"},
+                  "contentType":{".validate":"newData.isString()"}
+                }
+              }
+          }
+        }
+      }
+    },
+    "listsRef":{
+      ".read":true,
+        "$list_id":{
+          "authorId":{".validate":"newData.isString()"}
+        }
+      }
+  }
+}
