@@ -1,0 +1,11 @@
+{
+  "name": "videos-angular",
+  "version": "0.0.0",
+  "dependencies": {
+    
+  },
+  "devDependencies": {},
+  "appPath": "app",
+  "moduleName": "videosListApp",
+  "overrides": {}
+}

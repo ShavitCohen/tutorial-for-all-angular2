@@ -1,0 +1,30 @@
+<div class="row">
+    <div class="col s12"></div>
+</div>
+<div class="row">
+    <div class="col s12">
+        <a class="waves-effect waves-light btn" (click)="toggleNewList()"><i class="material-icons left">add</i>Add new list</a>
+    </div>
+</div>
+
+<list-properties-form *ngIf="showNewListForm" (submited)="saveNewList($event)" (canceled)="cancelSaveNewList($event)" 
+[list]="newList" action="new"></list-properties-form>
+
+
+<div class="row">
+    <ul *ngIf="authorizationService.getCurrentEditor()">
+        <li *ngFor="#list of authorizationService.getCurrentEditor().lists" class="col s3">
+
+            <a href="" [routerLink]="['EditList',{id:list.id}]" class="card blue-grey darken-1 z-depth-2 waves-effect waves-light" style="display:block">
+                <div class="card-content white-text">
+                    <span class="card-title">{{list.name}}</span>
+                    <div class="chip float-right" style="float:right;">
+                        {{list.contents.length}} Items
+                    </div>
+
+                    <p>{{list.description}}</p>
+                </div>
+            </a>
+        </li>
+    </ul>
+</div>

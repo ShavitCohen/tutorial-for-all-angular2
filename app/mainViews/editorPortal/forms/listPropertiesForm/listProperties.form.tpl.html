@@ -1,0 +1,32 @@
+<div class="row">
+    <form class="col s4">
+        <div class="row">
+            <div class="input-field col s12">
+                <input id="listName" [(ngModel)]="list.name" type="text" class="validate">
+                <label for="listName">List Name:</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-field col s12">
+                <textarea [(ngModel)]="list.description" type="text" id="listDescription" class="materialize-textarea" ></textarea>
+                <label for="listDescription">Description</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-field col s12">
+                <input  [(ngModel)]="list.topic" id="listTopic" type="text" class="validate">
+                <label for="listTopic">Topic</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col s12">
+                <input [(ngModel)]="list.publish" type="checkbox" id="publishInput" [disabled]="action=='new'" />
+                <label for="publishInput">Publish</label>
+            </div>
+        </div>
+        <div class="row">
+            <a class="col s4 waves-effect waves-light btn" (click)="submit()">{{action == 'new' ? 'Add New' : 'Save'}} List</a>
+            <a class="col offset-s1 s2 waves-effect waves-light btn" (click)="cancel()">Cancel</a>
+        </div>
+    </form>
+</div>

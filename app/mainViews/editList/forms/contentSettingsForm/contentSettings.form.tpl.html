@@ -1,0 +1,31 @@
+<div class="row">
+    <form class="col s12">
+        <div class="row">
+            <div class="input-field col s12">
+                <input id="contentName" [(ngModel)]="content.name" type="text" class="validate">
+                <label for="contentName">Video Name:</label>
+            </div>
+        </div>
+        
+         <div class="row">
+            <div class="input-field col s6">
+                <input id="contentUrl" [(ngModel)]="content.contentUrl" type="text" class="validate">
+                <label for="contentUrl">Video URL:</label>
+            </div>
+            <div class="input-field col s6">
+                <iframe *ngIf="content.contentUrl" width="150" height="120" [src]="content.getYoutubeEmbedURL()" frameborder="0" allowfullscreen></iframe>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="input-field col s12">
+                <textarea [(ngModel)]="content.description" type="text" id="contentDescription" class="materialize-textarea" ></textarea>
+                <label for="contentDescription">Description:</label>
+            </div>
+        </div>
+        <div class="row">
+            <a class="col s4 waves-effect waves-light btn" (click)="submit()">{{action == 'new' ? 'Add New' : 'Save'}} Content</a>
+            <a class="col offset-s1 s2 waves-effect waves-light btn" (click)="cancel()">Cancel</a>
+        </div>
+    </form>
+</div>

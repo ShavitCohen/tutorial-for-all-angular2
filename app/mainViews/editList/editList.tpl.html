@@ -1,0 +1,37 @@
+<div class="row">
+    <div class="col s12">
+        some header about the list
+
+    </div>
+</div>
+<div class="row">
+    <div *ngIf="thisList" class="col s3">
+        <button class="waves-effect waves-light btn" (click)="toggleNewVideo()"><i class="material-icons left">add</i>Add New Video</button>
+        <content-settings-form *ngIf="showNewContentForm" action="new" [content]="newContent" (canceled)="cancelSaveNewContent($event)"
+        (submited)="saveNewContent($event)"></content-settings-form>
+        <ul class="collection" id="sortable">
+            <li *ngFor="#content of thisList.contents" class="collection-item avatar" [id]="content.id">
+
+                <a href="" style="display:block">
+                    <img [src]="content.getYoutubeImage()" alt="" class="circle">
+
+                    <span class="title">{{content.name}}</span>
+                    <p>
+                        {{content.description}}
+                    </p>
+                    <a href="#!" class="reorder secondary-content"><i class="material-icons">reorder</i></a>
+                </a>
+
+
+            </li>
+        </ul>
+    </div>
+    <div class="row">
+        <div class="col s9">
+
+            <div id="editor-player">
+
+            </div>
+        </div>
+    </div>
+</div>
