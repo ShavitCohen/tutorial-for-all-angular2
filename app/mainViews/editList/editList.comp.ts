@@ -2,8 +2,10 @@ import {Component, OnInit, AfterViewInit, OnDestroy} from 'angular2/core';
 import {RouteParams} from 'angular2/router';
 import {AuthorizationService} from '../../services/authorization.service';
 import {BackendService} from '../../services/backend.service';
+import {YoutubePlayerService} from '../../services/youtubePlayer.service';
 import {List, Content} from '../../types/types';
 import {ContentSettingsForm} from './forms/contentSettingsForm/contentSettings.form';
+
 
 
 
@@ -13,13 +15,14 @@ import {ContentSettingsForm} from './forms/contentSettingsForm/contentSettings.f
     templateUrl: "app/mainViews/editList/editList.tpl.html",
     directives: [ContentSettingsForm],
     pipes:[],
-    providers: []
+    providers: [YoutubePlayerService]
 })
 export class EditListComponent implements OnInit, AfterViewInit {
     constructor(
         public authorization: AuthorizationService,
         private _routeParams: RouteParams,
-        private _backendService: BackendService
+        private _backendService: BackendService,
+        private _youtubePlayerService:YoutubePlayerService
     ) { }
     thisList: List
     showNewContentForm: boolean = false;
@@ -32,6 +35,8 @@ export class EditListComponent implements OnInit, AfterViewInit {
 
     ngAfterViewInit() {
         this._handleSortingContent();
+        this._youtubePlayerService.addYoutubeScriptTag();
+    
     }
     
     private _handleSortingContent() {
@@ -60,7 +65,8 @@ export class EditListComponent implements OnInit, AfterViewInit {
             
         }
     }
-
+    
+    
     toggleNewVideo() {
         this.showNewContentForm = !this.showNewContentForm;
         if (this.showNewContentForm) {

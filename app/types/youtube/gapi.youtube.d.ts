@@ -7,7 +7,7 @@
 /// <reference path="./gapi.d.ts" />
 
 declare namespace gapi.client.youtube {
-
+    
     export interface activities {
 
         /**
