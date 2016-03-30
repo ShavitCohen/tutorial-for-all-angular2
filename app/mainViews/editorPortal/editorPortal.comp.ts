@@ -3,7 +3,7 @@ import {ROUTER_DIRECTIVES, Router} from 'angular2/router';
 import {AuthorizationService} from '../../services/authorization.service';
 import {BackendService} from '../../services/backend.service';
 import {listPropertiesFormComponent} from './forms/listPropertiesForm/listProperties.form.comp';
-import {List} from '../../types/types';
+import {List,Editor} from '../../types/types';
 
 @Component({
     selector: 'editor-portal',
@@ -12,7 +12,7 @@ import {List} from '../../types/types';
     providers: []
 })
 export class EditorPortalComponent implements OnInit {
-
+    public currentEditor:Editor;
 
     constructor(
         public authorizationService: AuthorizationService,
@@ -23,7 +23,15 @@ export class EditorPortalComponent implements OnInit {
     showNewListForm: boolean = false;
 
     ngOnInit() {
-        console.log('init');
+        let _this = this;
+        this.authorizationService.getCurrentEditor()
+        .then(function(editor:Editor){
+            _this.currentEditor = editor;
+        })
+        .catch(function(){
+             //no authorization
+             _this._router.navigate(['HomePage']);
+        })
     }
 
     

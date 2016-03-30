@@ -4,7 +4,7 @@ import {Editor, List, Content, FirebaseBackend} from '../types/types';
 @Injectable()
 export class BackendService {
     private _currentAuth: FirebaseAuthData;
-    public _currentEditor:Editor;
+    public currentEditor: Editor;
     _firebaseRef: Firebase;
 
     constructor() {
@@ -17,9 +17,9 @@ export class BackendService {
         let _this = this;
 
         return _this._firebaseRef.authWithOAuthPopup(source, { scope: scope })
-            .then(registerUserIfNotExists)
+            .then(registerEditorIfNotExists)
 
-        function registerUserIfNotExists(userAuth: FirebaseAuthData) {
+        function registerEditorIfNotExists(userAuth: FirebaseAuthData) {
             _this._currentAuth = userAuth;
             return _this.getEditor(userAuth)
                 .then(function(editor) {
@@ -43,18 +43,23 @@ export class BackendService {
     getEditor(userAuth: FirebaseAuthData): Promise<Editor> {
         let _this = this;
         let p = new Promise(function(resolve, reject) {
-            _this._firebaseRef.child("users").child(userAuth.uid).once("value")
-                .then(function(snapshot: FirebaseDataSnapshot) {
-                    var editor: Editor;
-                    if (snapshot.val()) {
-                        var data = snapshot.val();
-                        editor = new Editor(data.name, data.email, data.imageUrl, data.lists);
-                        resolve(editor);
-                    } else {
-                        reject(userAuth)
-                    }
-                })
+            if (_this.currentEditor && userAuth[userAuth.provider].email == _this.currentEditor.email) {
+                resolve(_this.currentEditor);
+            } else {
+                _this._firebaseRef.child("users").child(userAuth.uid).once("value")
+                    .then(function(snapshot: FirebaseDataSnapshot) {
+                        var editor: Editor;
+                        if (snapshot.val()) {
+                            var data = snapshot.val();
+                            editor = new Editor(data.name, data.email, data.imageUrl, data.lists);
+                            resolve(editor);
+                        } else {
+                            reject(userAuth)
+                        }
+                    })
+            }
         })
+
         return p;
     }
 
@@ -81,35 +86,35 @@ export class BackendService {
             _this._firebaseRef.child("users").child(_this._currentAuth.uid).child("lists").child(list.id.toString()).set(list.getDataForSavingList());
 
             function _afterAdd(listSnapshot: FirebaseDataSnapshot) {
-                _this._currentEditor.lists.push(list);
+                _this.currentEditor.lists.push(list);
                 resolve(list);
             }
         })
         return p;
     }
-    
-    updateList(list:List):Promise<any> {
+
+    updateList(list: List): Promise<any> {
         let _this = this;
-        var p = new Promise(function(resolve,reject){
-            _this._firebaseRef.child("users").child(_this._currentAuth.uid).child(list.id.toString()).update(list.getDataForSavingList(),_afterUpdate)
-            
-            function _afterUpdate(error){
-                if(error){
+        var p = new Promise(function(resolve, reject) {
+            _this._firebaseRef.child("users").child(_this._currentAuth.uid).child(list.id.toString()).update(list.getDataForSavingList(), _afterUpdate)
+
+            function _afterUpdate(error) {
+                if (error) {
                     reject(error)
-                }else{
-                    
+                } else {
+
                     resolve(list);
-                }                
+                }
             }
         })
-        
-        
+
+
         return p;
     }
-    
-    
-    
-      addNewContent(content: Content, list:List): Promise<any> {
+
+
+
+    addNewContent(content: Content, list: List): Promise<any> {
         let _this = this;
         var p = new Promise(function(resolve, reject) {
 
@@ -123,34 +128,34 @@ export class BackendService {
         })
         return p;
     }
-    
-    updateContent(content:Content,list:List):Promise<any> {
+
+    updateContent(content: Content, list: List): Promise<any> {
         let _this = this;
-        var p = new Promise(function(resolve,reject){
-            _this._firebaseRef.child("users").child(_this._currentAuth.uid).child(list.id.toString()).child("contents").child(content.id.toString()).update(content.getDataForSaving(),_afterUpdate);
-            
-            function _afterUpdate(error){
-                if(error){
+        var p = new Promise(function(resolve, reject) {
+            _this._firebaseRef.child("users").child(_this._currentAuth.uid).child(list.id.toString()).child("contents").child(content.id.toString()).update(content.getDataForSaving(), _afterUpdate);
+
+            function _afterUpdate(error) {
+                if (error) {
                     reject(error)
-                }else{
+                } else {
                     resolve(content);
-                }                
+                }
             }
         })
-        
-        
+
+
         return p;
     }
-    
-    updateContentsOrder(list:List){
+
+    updateContentsOrder(list: List) {
         let updateContentData = {};
-        let listPath = "users/" + this._currentAuth.uid  + "/lists/" + list.id + "/contents/";
+        let listPath = "users/" + this._currentAuth.uid + "/lists/" + list.id + "/contents/";
         for (let i = 0; i < list.contents.length; i++) {
             let content = list.contents[i];
             updateContentData[listPath + content.id + "/order"] = content.order;
         }
-        this._firebaseRef.update(updateContentData,function (error){
-            
+        this._firebaseRef.update(updateContentData, function(error) {
+
         })
     }
 

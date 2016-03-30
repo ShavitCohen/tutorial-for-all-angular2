@@ -8,19 +8,29 @@ export class AuthorizationService {
         private _backendService: BackendService
     ) { }
 
+
     initSertivce() {
-        let authData: FirebaseAuthData = this.isAuthenticated();
-        if (authData) {
-            let _this = this;
-            this._backendService.getEditor(authData)
-                .then(function(currentEditor) {
-                    _this._backendService._currentEditor = currentEditor;
-                })
-        }
+        let _this = this;
+        this.getCurrentEditor()
+            .then(function(currentEditor) {
+                _this._backendService.currentEditor = currentEditor;
+            })
+            .catch(function(){
+                //editor does not exists
+            })
     }
-    
-    getCurrentEditor(){
-        return this._backendService._currentEditor;
+
+    getCurrentEditor(): Promise<Editor> {
+        let authData: FirebaseAuthData = this.isAuthenticated();
+
+        if (authData) {
+            return this._backendService.getEditor(authData)
+        } else {
+            let p = new Promise(function(resolve, reject) {
+                reject(null);
+            })
+            return p;
+        }
     }
 
 
@@ -30,7 +40,7 @@ export class AuthorizationService {
         let p = new Promise(function(resolve, reject) {
             _this._backendService.logIn(source)
                 .then(function(editor: Editor) {
-                    _this._backendService._currentEditor = editor;
+                    _this._backendService.currentEditor = editor;
                     resolve(editor);
                 })
         })
@@ -43,7 +53,7 @@ export class AuthorizationService {
         let p = new Promise(function(resolve, reject) {
             _this._backendService.logOut()
                 .then(function() {
-                    _this._backendService._currentEditor = null;
+                    _this._backendService.currentEditor = null;
                     resolve();
                 })
         })

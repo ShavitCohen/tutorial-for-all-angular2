@@ -7,24 +7,29 @@
     </div>
 </div>
 
-<list-properties-form *ngIf="showNewListForm" (submited)="saveNewList($event)" (canceled)="cancelSaveNewList($event)" 
-[list]="newList" action="new"></list-properties-form>
+<list-properties-form *ngIf="showNewListForm" (submited)="saveNewList($event)" (canceled)="cancelSaveNewList($event)" [list]="newList"
+action="new"></list-properties-form>
 
 
 <div class="row">
-    <ul *ngIf="authorizationService.getCurrentEditor()">
-        <li *ngFor="#list of authorizationService.getCurrentEditor().lists" class="col s3">
+    <div *ngIf="currentEditor">
+        <ul>
+            <li *ngFor="#list of currentEditor.lists" class="col s3">
 
-            <a href="" [routerLink]="['EditList',{id:list.id}]" class="card blue-grey darken-1 z-depth-2 waves-effect waves-light" style="display:block">
-                <div class="card-content white-text">
-                    <span class="card-title">{{list.name}}</span>
-                    <div class="chip float-right" style="float:right;">
-                        {{list.contents.length}} Items
+                <a href="" [routerLink]="['EditList',{id:list.id}]" class="card blue-grey darken-1 z-depth-2 waves-effect waves-light" style="display:block">
+                    <div class="card-content white-text">
+                        <span class="card-title">{{list.name}}</span>
+                        <div class="chip float-right" style="float:right;">
+                            {{list.contents.length}} Items
+                        </div>
+
+                        <p>{{list.description}}</p>
                     </div>
-
-                    <p>{{list.description}}</p>
-                </div>
-            </a>
-        </li>
-    </ul>
+                </a>
+            </li>
+        </ul>
+        <div *ngIf="currentEditor.lists.length == 0" class="col s12">
+            No Lists available
+        </div>
+    </div>
 </div>
