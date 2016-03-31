@@ -26,7 +26,7 @@ import {ROUTER_PROVIDERS,ROUTER_DIRECTIVES, RouteConfig, Location, LocationStrat
 @RouteConfig([
   {path:'/home', name:"HomePage", component:HomePageComponent, useAsDefault:true},
   {path:'/editorPortal', name:'EditorPortal', component:EditorPortalComponent},
-  {path:'/editList/:id', name:'EditList', component:EditListComponent}
+  {path:'/editList', name:'EditList', component:EditListComponent}
 ])
 export class AppComponent implements OnInit{
     constructor(
