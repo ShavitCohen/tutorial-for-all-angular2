@@ -82,6 +82,11 @@ export class Content {
         public contentType: string,
         public order?:number
     ) { }
+    public duration:Number;
+    
+    setDuration(duration:Number){
+        this.duration = duration;
+    }
     
     getDataForSaving(){
         return {
@@ -124,3 +129,4 @@ export class Content {
         }
     }
 }
+

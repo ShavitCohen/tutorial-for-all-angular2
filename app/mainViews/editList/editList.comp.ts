@@ -1,11 +1,12 @@
-import {Component, OnInit, AfterViewInit, OnDestroy} from 'angular2/core';
-import {RouteParams} from 'angular2/router';
+import {Component, OnInit, OnDestroy} from 'angular2/core';
+import {RouteParams, Router} from 'angular2/router';
 import {AuthorizationService} from '../../services/authorization.service';
 import {BackendService} from '../../services/backend.service';
 import {YoutubePlayerService} from '../../services/youtubePlayer.service';
 import {List, Content} from '../../types/types';
 import {ContentSettingsForm} from './forms/contentSettingsForm/contentSettings.form';
-
+import {ListItemComponent} from './listItem/listItem.comp';
+import {SecondsToMinutesPipe} from '../../pipes/secondsToMinutes.pipe';
 
 
 
@@ -13,32 +14,74 @@ import {ContentSettingsForm} from './forms/contentSettingsForm/contentSettings.f
 @Component({
     selector: "edit-list",
     templateUrl: "app/mainViews/editList/editList.tpl.html",
-    directives: [ContentSettingsForm],
-    pipes:[],
+    styleUrls: ["app/mainViews/editList/editList.css"],
+    directives: [ContentSettingsForm, ListItemComponent],
+    pipes: [SecondsToMinutesPipe],
     providers: [YoutubePlayerService]
 })
-export class EditListComponent implements OnInit, AfterViewInit {
+export class EditListComponent implements OnInit {
     constructor(
         public authorization: AuthorizationService,
         private _routeParams: RouteParams,
         private _backendService: BackendService,
-        private _youtubePlayerService:YoutubePlayerService
+        private _youtubePlayerService: YoutubePlayerService,
+        private _router: Router
     ) { }
     thisList: List
     showNewContentForm: boolean = false;
     newContent: Content;
     private _contentsUL
+    selectedContent: Content;
+    public startTime:Number;
+    public endTime:Number;
 
     ngOnInit() {
-        this.thisList = this.authorization.getCurrentEditor().lists.find(l => l.id.toString() == this._routeParams.get('id'))
+        let _thiss = this;
+        _thiss.authorization.getCurrentEditor()
+            .then(function(currentEditor) {
+                _thiss.thisList = currentEditor.lists.find(l => l.id.toString() == _thiss._routeParams.get('id'));
+                setTimeout(function() {
+                    //waiting for the DOM to be rendered
+                    _thiss._triggerPageScripts();
+                });
+            })
+            .catch(function() {
+                //no authorization
+                _thiss._router.navigate(['HomePage']);
+            })
     }
 
-    ngAfterViewInit() {
+    _triggerPageScripts() {
         this._handleSortingContent();
-        this._youtubePlayerService.addYoutubeScriptTag();
-    
+        let _this = this;
+        this._youtubePlayerService.initiateYoutubePlayer()
+            .then(function() {
+                _this._youtubePlayerService.playVideo(_this.thisList.contents[0])
+                .then(function(obj:any){
+                    _this.thisList.contents[0].setDuration(obj.duration);
+                })
+            })
     }
     
+    private _setSlider (content:Content){
+        let _this = this;
+        $("#slider-range").slider({
+            range: true,
+            min: 0,
+            max: Number(content.duration),
+            values: [content.startTime, content.endTime ? content.endTime : Number(content.duration)],
+            slide: function(event, ui) {
+                let startTime = ui.values[0];
+                let endTime = ui.values[1];
+                
+                _this.startTime = startTime;
+                _this.endTime = endTime;
+            }
+        });
+    }
+
+
+
     private _handleSortingContent() {
         let _this = this;
         _this._contentsUL = $("#sortable");
@@ -62,11 +105,11 @@ export class EditListComponent implements OnInit, AfterViewInit {
                 }
             }
             _this._backendService.updateContentsOrder(_this.thisList);
-            
+
         }
     }
-    
-    
+
+
     toggleNewVideo() {
         this.showNewContentForm = !this.showNewContentForm;
         if (this.showNewContentForm) {
@@ -85,5 +128,15 @@ export class EditListComponent implements OnInit, AfterViewInit {
             .then(function(content) {
                 _this.showNewContentForm = false;
             })
+    }
+
+    selectItemFromTheList(content: Content) {
+        this.selectedContent = content;
+        let _this = this;
+        this._youtubePlayerService.playVideo(content)        
+        .then(function(obj:any){
+            content.setDuration(obj.duration);
+            _this._setSlider(content);
+        })
     }
 }

@@ -10,28 +10,21 @@
         <content-settings-form *ngIf="showNewContentForm" action="new" [content]="newContent" (canceled)="cancelSaveNewContent($event)"
         (submited)="saveNewContent($event)"></content-settings-form>
         <ul class="collection" id="sortable">
-            <li *ngFor="#content of thisList.contents" class="collection-item avatar" [id]="content.id">
-
-                <a href="" style="display:block">
-                    <img [src]="content.getYoutubeImage()" alt="" class="circle">
-
-                    <span class="title">{{content.name}}</span>
-                    <p>
-                        {{content.description}}
-                    </p>
-                    <a href="#!" class="reorder secondary-content"><i class="material-icons">reorder</i></a>
-                </a>
-
-
+            <li class="collection-item avatar" *ngFor="#content of thisList.contents" [id]="content.id" [ngClass]="{selected:selectedContent == content}">
+                <list-item [content]="content" [isSelectedItem]="selectedContent == content" (itemClicked)="selectItemFromTheList($event)"></list-item>
             </li>
         </ul>
     </div>
     <div class="row">
-        <div class="col s9">
+        <div class="col s5" id="editor-player">
 
-            <div id="editor-player">
-
-            </div>
+        </div>
+        <div class="col s4">
+            <div id="slider-range"></div>
+            
+            <div>start:{{startTime | secondsToMinutes}}</div>
+            <div>start:{{startTime}}</div>
+            <div>end:{{endTime | secondsToMinutes}}</div>
         </div>
     </div>
 </div>
